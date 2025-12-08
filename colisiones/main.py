@@ -5,7 +5,7 @@ import sys
 from time import perf_counter
 
 from .generador import generar_puntos
-from .algoritmos import fuerza_bruta, par_mas_cercano_dyv
+from .algoritmos import fuerza_bruta, par_mas_cercano_dyv, pares_en_riesgo
 
 
 def pedir_entero(mensaje: str, minimo: int = 1) -> int:
@@ -80,19 +80,21 @@ def main(argv: list[str]) -> None:
         return
 
     if res_dyv.distancia <= umbral:
-        print(f"⚠️  Distancia mínima {res_dyv.distancia:.4f} <= umbral → POSIBLE COLISIÓN DETECTADA")
-
-        # mostrar máximo 5 pares
-        pares = res_dyv.pares[:5]
-
-        for idx, (a, b) in enumerate(pares, start=1):
-            print(f"#{idx}: Avión {a.id} ({a.x}, {a.y})  <->  Avión {b.id} ({b.x}, {b.y})")
-
-        if len(res_dyv.pares) > 5:
-            print(f"... y {len(res_dyv.pares) - 5} pares adicionales con la misma distancia mínima.")
-
+        print(f"\n⚠️  Distancia mínima {res_dyv.distancia:.4f} <= umbral → POSIBLE COLISIÓN DETECTADA")
     else:
-        print(f"Distancia mínima {res_dyv.distancia:.4f} > umbral → No hay riesgo de colisión.")
+        print(f"\nDistancia mínima {res_dyv.distancia:.4f} > umbral → No hay riesgo de colisión.")
+
+    # Además, listar TODAS las parejas dentro del umbral
+    distancia_min, pares_riesgo = pares_en_riesgo(puntos, umbral)
+    print(f"\nDistancia mínima global (recalculada): {distancia_min:.4f}")
+    print(f"Pares en riesgo (distancia ≤ {umbral:.4f}): {len(pares_riesgo)}")
+
+    if pares_riesgo:
+        print("\nAlgunos pares en posible colisión:")
+        for idx, (a, b) in enumerate(pares_riesgo[:5], start=1):
+            print(f"#{idx}: Avión {a.id} ({a.x}, {a.y})  <->  Avión {b.id} ({b.x}, {b.y})")
+        if len(pares_riesgo) > 5:
+            print(f"... y {len(pares_riesgo) - 5} pares adicionales con la misma condición.")
 
     print("\nAnálisis completado.\n")
 

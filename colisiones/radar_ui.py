@@ -7,19 +7,16 @@ from typing import List, Optional, Tuple
 from .generador import generar_puntos
 from .algoritmos import pares_en_riesgo
 from .modelos import Avion, ResultadoColision
-# ==========================
-#  Configuración de estilos
-# ==========================
 
 BG_COLOR = "#060714"      # Fondo general
 CANVAS_BG = "#02030A"     # Fondo del radar
-PRIMARY_COLOR = "#14FFEC" # Cian neón
-ACCENT_COLOR = "#FF3366"  # Rosa acento
-TEXT_COLOR = "#E5E5E5"    # Texto
-GRID_COLOR = "#1F2933"    # Líneas suaves
-RADAR_RING = "#0AFF9D"    # Anillos del radar
-RADAR_SWEEP = "#00FF88"   # Línea del radar
-POINT_COLOR = "#58A6FF"   # Aviones
+PRIMARY_COLOR = "#f1acff" 
+ACCENT_COLOR = "#bf05e5"  
+TEXT_COLOR = "#E5E5E5"   
+GRID_COLOR = "#1F2933"   
+RADAR_RING = "#ffb2e1"    # Anillos del radar
+RADAR_SWEEP = "#ff009b"   # Línea del radar
+POINT_COLOR = "#a0fff6"   # Aviones
 HIGHLIGHT_COLOR = "#FFEA00"  # Aviones en posible colisión
 
 PLANE_MAX_X = 1000
@@ -37,7 +34,7 @@ class InterfazColisiones:
         self.radar_angle: float = 0
         self.radar_line: Optional[int] = None
 
-        # Datos del modelo
+
         self.aviones: List[Avion] = []
         self.ultimo_resultado: Optional[ResultadoColision] = None
 
@@ -46,9 +43,7 @@ class InterfazColisiones:
         self._dibujar_radar_base()
         self._animar_radar()
 
-    # ==========================
-    #  Estilos ttk
-    # ==========================
+    
     def _configurar_estilos(self):
         style = ttk.Style()
         style.theme_use("clam")
@@ -81,19 +76,16 @@ class InterfazColisiones:
             insertcolor=TEXT_COLOR,
         )
 
-    # ==========================
-    #  Layout general
-    # ==========================
+   
     def _crear_layout(self):
-        # Frame superior (título + controles)
+       
         top_frame = ttk.Frame(self.root, style="Dark.TFrame", padding=(20, 15))
         top_frame.pack(side=tk.TOP, fill=tk.X)
 
-        # ---------- HEADER: logo + título ----------
         header_frame = ttk.Frame(top_frame, style="Dark.TFrame")
         header_frame.pack(side=tk.TOP, fill=tk.X)
 
-        # Logo avioncito
+        # Logo 
         logo_canvas = tk.Canvas(
             header_frame,
             width=60,
@@ -102,23 +94,20 @@ class InterfazColisiones:
             highlightthickness=0,
         )
         logo_canvas.pack(side=tk.LEFT, padx=(0, 10))
-
-        # Radar circular
         logo_canvas.create_oval(8, 8, 52, 52, outline=PRIMARY_COLOR, width=2)
-        # Cuerpo del avión
         logo_canvas.create_polygon(
             30, 12, 25, 28, 30, 48, 35, 28,
             fill=PRIMARY_COLOR,
             outline=PRIMARY_COLOR,
         )
-        # Alas
+        
         logo_canvas.create_polygon(
             18, 26, 30, 22, 42, 26, 30, 30,
             fill=BG_COLOR,
             outline=PRIMARY_COLOR,
             width=1,
         )
-        # Cola
+
         logo_canvas.create_polygon(
             24, 42, 30, 40, 36, 42, 30, 45,
             fill=BG_COLOR,
@@ -126,7 +115,6 @@ class InterfazColisiones:
             width=1,
         )
 
-        # Título + subtítulo
         title_frame = ttk.Frame(header_frame, style="Dark.TFrame")
         title_frame.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
@@ -144,7 +132,6 @@ class InterfazColisiones:
         )
         subtitle_label.pack(side=tk.TOP, anchor="w", pady=(2, 10))
 
-        # Línea de controles
         controls_frame = ttk.Frame(top_frame, style="Dark.TFrame")
         controls_frame.pack(side=tk.TOP, fill=tk.X, pady=(5, 0))
 
@@ -185,7 +172,6 @@ class InterfazColisiones:
         )
         self.status_label.pack(side=tk.RIGHT)
 
-        # Frame central (canvas radar + panel info)
         center_frame = ttk.Frame(self.root, style="Dark.TFrame", padding=(10, 10))
         center_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -208,7 +194,6 @@ class InterfazColisiones:
         ).pack(anchor="w", pady=(0, 10))
 
         info_text = (
-            "🛫 Simulador visual + lógica integrada\n\n"
             "• Ingresa N aeronaves y pulsa 'Generar puntos'.\n"
             "  Se usan coordenadas aleatorias en el plano 1000x1000.\n"
             "• El radar muestra la posición de cada avión.\n"
@@ -234,12 +219,8 @@ class InterfazColisiones:
         self.info_label.configure(state="disabled")
         self.info_label.pack(fill=tk.BOTH, expand=True)
 
-        # Footer con nombres
-        footer_frame = ttk.Frame(self.root, style="Dark.TFrame", padding=(10, 5))
-        footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
-
         autores_label = ttk.Label(
-            footer_frame,
+            side_panel,
             text="Responsables del proyecto: Maryury Villa y Karen Duque",
             font=("Segoe UI Semibold", 12),
             background=BG_COLOR,
@@ -247,9 +228,8 @@ class InterfazColisiones:
         )
         autores_label.pack(side=tk.RIGHT)
 
-    # ==========================
-    #  Dibujo base del radar
-    # ==========================
+ 
+    # radar
     def _dibujar_radar_base(self):
         self.canvas.delete("all")
 
@@ -259,7 +239,6 @@ class InterfazColisiones:
         self.cy = h // 2
         self.r = min(w, h) // 2 - 40
 
-        # Texto encima
         self.canvas.create_text(
             self.cx,
             20,
@@ -268,7 +247,6 @@ class InterfazColisiones:
             font=("Segoe UI Semibold", 11),
         )
 
-        # Fondo y grid
         self.canvas.create_rectangle(0, 0, w, h, fill=CANVAS_BG, outline="")
         step = 40
         for x in range(0, w, step):
@@ -276,7 +254,6 @@ class InterfazColisiones:
         for y in range(0, h, step):
             self.canvas.create_line(0, y, w, y, fill=GRID_COLOR)
 
-        # Anillos del radar
         for factor in [0.3, 0.5, 0.7, 1.0]:
             r = self.r * factor
             self.canvas.create_oval(
@@ -287,7 +264,6 @@ class InterfazColisiones:
                 outline=RADAR_RING,
             )
 
-        # Ejes
         self.canvas.create_line(
             self.cx - self.r - 10,
             self.cy,
@@ -303,7 +279,6 @@ class InterfazColisiones:
             fill=RADAR_RING,
         )
 
-        # Estación central
         self.canvas.create_oval(
             self.cx - 5,
             self.cy - 5,
@@ -321,9 +296,8 @@ class InterfazColisiones:
             font=("Segoe UI", 11),
         )
 
-    # ==========================
-    #  Animación
-    # ==========================
+
+    #  Animación del radar|
     def _animar_radar(self):
         if self.radar_line is not None:
             self.canvas.delete(self.radar_line)
@@ -344,9 +318,7 @@ class InterfazColisiones:
 
         self.root.after(30, self._animar_radar)
 
-    # ==========================
-    #  Utilidades de dibujo
-    # ==========================
+   
     def _mapear_a_canvas(self, x: float, y: float) -> Tuple[float, float]:
         """
         Mapea coordenadas del plano [0,1000]x[0,1000] a la zona circular del radar.
@@ -373,15 +345,13 @@ class InterfazColisiones:
             outline="",
         )
 
-    # ==========================
-    #  Handlers de botones
-    # ==========================
+
     def on_generar_puntos(self):
         self._dibujar_radar_base()
         self.aviones.clear()
         self.ultimo_resultado = None
 
-        # Leer N
+        # Leer n
         try:
             n = int(self.entry_n.get())
         except ValueError:
@@ -394,7 +364,7 @@ class InterfazColisiones:
             )
             return
 
-        # Generar con tu generador
+    
         self.aviones = generar_puntos(
             n=n,
             max_x=PLANE_MAX_X,
@@ -416,7 +386,7 @@ class InterfazColisiones:
             )
             return
 
-        # Leer umbral
+        # Lee el umbral
         umbral_txt = self.entry_umbral.get().strip()
         try:
             umbral = float(umbral_txt)
@@ -430,10 +400,9 @@ class InterfazColisiones:
             )
             return
 
-        # Buscar TODAS las parejas en riesgo
+        # parejas en riesgo
         distancia_min, pares_riesgo = pares_en_riesgo(self.aviones, umbral)
 
-        # Redibujar radar + todos los aviones normales
         self._dibujar_radar_base()
         for avion in self.aviones:
             self._dibujar_avion(avion)
@@ -453,7 +422,7 @@ class InterfazColisiones:
             )
             return
 
-        # Dibujar TODAS las colisiones encontradas
+    
         for a, b in pares_riesgo:
             x1, y1 = self._mapear_a_canvas(a.x, a.y)
             x2, y2 = self._mapear_a_canvas(b.x, b.y)
